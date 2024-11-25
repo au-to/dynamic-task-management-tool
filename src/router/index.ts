@@ -1,4 +1,4 @@
-import { createRouter, createMemoryHistory } from 'vue-router';
+import { createRouter, createMemoryHistory } from 'vue-router'
 
 const routes = [
   {
@@ -6,11 +6,21 @@ const routes = [
     name: 'home',
     component: () => import('../routes/home/index.vue')
   },
+  {
+    path: '/register',
+    name: 'register',
+    component: () => import('../routes/register/index.vue')
+  },
+  {
+    path: '/login',
+    name:'login',
+    component: () => import('../routes/login/index.vue')
+  },
 ];
 
 const router = createRouter({
   history: createMemoryHistory(),
-  routes,
-});
+  routes
+})
 
-export default router;
+export default router

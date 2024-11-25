@@ -38,16 +38,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
-import { useTaskStore } from '../../store/task.ts';
-import { useUserStore } from '../../store/user.ts';
+import { ref, reactive } from 'vue'
+import { useTaskStore } from '@/src/store/modules/task.ts'
+import { useUserStore } from '@/src/store/modules/user.ts'
 
 // 引入状态管理模块
-const taskStore = useTaskStore();
-const userStore = useUserStore();
+const taskStore = useTaskStore()
+const userStore = useUserStore()
 
 // 控制新增任务的弹窗
-const showCreateModal = ref(false);
+const showCreateModal = ref(false)
 
 // 新任务的默认数据
 const newTask = reactive({
@@ -57,42 +57,42 @@ const newTask = reactive({
   priority: 'Medium',
   status: 'To Do',
   dueDate: '',
-});
+})
 
 // 任务的状态列表
-const statuses = ['To Do', 'In Progress', 'Done'];
+const statuses = ['To Do', 'In Progress', 'Done']
 
 // 创建任务
 const createTask = () => {
-  newTask.id = Date.now().toString(); // 使用时间戳生成唯一 ID
-  taskStore.addTask({ ...newTask });  // 添加任务到 store
-  showCreateModal.value = false;     // 关闭弹窗
-};
+  newTask.id = Date.now().toString() // 使用时间戳生成唯一 ID
+  taskStore.addTask({ ...newTask })  // 添加任务到 store
+  showCreateModal.value = false     // 关闭弹窗
+}
 
 // 筛选任务：根据状态返回对应的任务列表
-const filteredTasks = (status: string) => taskStore.getTasksByStatus(status);
+const filteredTasks = (status: string) => taskStore.getTasksByStatus(status)
 
 // 获取优先级对应的颜色
 const priorityColor = (priority: string) => {
   switch (priority) {
     case 'High':
-      return 'danger';
+      return 'danger'
     case 'Medium':
-      return 'warning';
+      return 'warning'
     default:
-      return 'success';
+      return 'success'
   }
-};
+}
 
 // 用户登录
 const login = () => {
-  userStore.login('John Doe'); // 模拟登录
-};
+  userStore.login('John Doe') // 模拟登录
+}
 
 // 用户退出
 const logout = () => {
-  userStore.logout(); // 模拟退出
-};
+  userStore.logout() // 模拟退出
+}
 </script>
 
 <style scoped lang="scss">
