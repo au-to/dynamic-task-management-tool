@@ -1,6 +1,5 @@
 <template>
   <div class="home">
-    <el-button v-if="!userStore.isLoggedIn" @click="login">登录</el-button>
     <el-button v-if="userStore.isLoggedIn" @click="logout">退出登录</el-button>
     <el-button type="primary" @click="showCreateModal = true">新增任务</el-button>
     <div class="task-board">

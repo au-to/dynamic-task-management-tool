@@ -1,8 +1,12 @@
-import { createRouter, createMemoryHistory } from 'vue-router'
+import { createRouter, createWebHistory  } from 'vue-router'
 
 const routes = [
   {
     path: '/',
+    redirect: '/home'
+  },
+  {
+    path: '/home',
     name: 'home',
     component: () => import('../routes/home/index.vue')
   },
@@ -16,10 +20,10 @@ const routes = [
     name:'login',
     component: () => import('../routes/login/index.vue')
   },
-];
+]
 
 const router = createRouter({
-  history: createMemoryHistory(),
+  history: createWebHistory(),
   routes
 })
 
