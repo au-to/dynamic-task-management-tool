@@ -33,7 +33,7 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import useUserStore from '@/store/modules/use.ts'
+import useUserStore from '@/src/store/modules/user.ts'
 
 const router = useRouter()
 const loginFormRef = ref()
