@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <el-button>{{ 'hello' + ' ' + userStore.username }}</el-button>
     <el-button v-if="userStore.isLoggedIn" @click="logout">退出登录</el-button>
     <el-button type="primary" @click="showCreateModal = true">新增任务</el-button>
     <div class="task-board">
@@ -38,8 +39,11 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { useTaskStore } from '@/src/store/modules/task.ts'
-import { useUserStore } from '@/src/store/modules/user.ts'
+import { useRouter } from 'vue-router'
+import useTaskStore from '@/src/store/modules/task.ts'
+import useUserStore from '@/src/store/modules/user.ts'
+
+const router = useRouter()
 
 // 引入状态管理模块
 const taskStore = useTaskStore()
@@ -84,12 +88,13 @@ const priorityColor = (priority: string) => {
 }
 
 // 用户登录
-const login = () => {
-  userStore.login('John Doe') // 模拟登录
-}
+// const login = () => {
+//   userStore.login('John Doe') // 模拟登录
+// }
 
 // 用户退出
 const logout = () => {
+  router.push('/login') // 跳转到登录页面
   userStore.logout() // 模拟退出
 }
 </script>

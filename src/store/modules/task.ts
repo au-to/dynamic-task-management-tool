@@ -14,7 +14,7 @@ export interface Task {
   dueDate: string // 截止日期
 }
 
-export const useTaskStore = defineStore('task', () => {
+export default defineStore('task', () => {
   // 定义任务列表的状态
   const taskList = ref<Task[]>([])
 

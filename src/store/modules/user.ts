@@ -5,7 +5,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
-export const useUserStore = defineStore('user', () => {
+export default defineStore('user', () => {
   // 定义用户状态
   const username = ref('')
   const isLoggedIn = ref(false)

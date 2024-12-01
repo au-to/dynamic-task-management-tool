@@ -35,6 +35,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import useUserStore from '@/src/store/modules/user.ts'
 
+const userStore = useUserStore()
 const router = useRouter()
 const loginFormRef = ref()
 const loginForm = reactive({
@@ -50,6 +51,8 @@ const rules = {
 const handleLogin = () => {
   loginFormRef.value?.validate((valid: boolean) => {
     if (valid) {
+      userStore.username = loginForm.username
+      userStore.isLoggedIn = true
       ElMessage({
         message: '登录成功',
         type: 'success',
