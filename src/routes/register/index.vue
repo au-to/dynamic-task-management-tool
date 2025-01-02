@@ -50,20 +50,19 @@ const registerForm = reactive({
   confirmPassword: ""
 })
 
+const ruleFn = (rule: any, value: string) => {
+  if (value !== registerForm.password) {
+    return new Error("两次密码输入不一致")
+  }
+  return true
+}
+
 const rules = {
   username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
   password: [{ required: true, message: "请输入密码", trigger: "blur" }],
   confirmPassword: [
     { required: true, message: "请确认密码", trigger: "blur" },
-    {
-      validator: (rule: any, value: string) => {
-        if (value !== registerForm.password) {
-          return new Error("两次密码输入不一致");
-        }
-        return true;
-      },
-      trigger: "blur"
-    }
+    { validator: ruleFn, trigger: "blur" }
   ]
 }
 

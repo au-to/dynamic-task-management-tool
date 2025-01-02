@@ -10,7 +10,7 @@ export interface Task {
   title: string
   description: string
   priority: 'Low' | 'Medium' | 'High' // 优先级
-  status: 'To Do' | 'In Progress' | 'Done' // 状态
+  status: 'Pending' | 'Progress' | 'Done' // 状态
   dueDate: string // 截止日期
 }
 

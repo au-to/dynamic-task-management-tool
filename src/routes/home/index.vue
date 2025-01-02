@@ -57,13 +57,13 @@ const newTask = reactive({
   id: '',
   title: '',
   description: '',
-  priority: 'Medium',
-  status: 'To Do',
-  dueDate: '',
+  priority: '',
+  status: 'Pending',
+  dueDate: ''
 })
 
 // 任务的状态列表
-const statuses = ['To Do', 'In Progress', 'Done']
+const statuses = ['Pending', 'Progress', 'Done']
 
 // 创建任务
 const createTask = () => {
@@ -86,11 +86,6 @@ const priorityColor = (priority: string) => {
       return 'success'
   }
 }
-
-// 用户登录
-// const login = () => {
-//   userStore.login('John Doe') // 模拟登录
-// }
 
 // 用户退出
 const logout = () => {
