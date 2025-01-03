@@ -1,20 +1,39 @@
 <template>
   <div class="home">
-    <el-button>{{ 'hello' + ' ' + userStore.username }}</el-button>
-    <el-button v-if="userStore.isLoggedIn" @click="logout">退出登录</el-button>
-    <el-button type="primary" @click="showCreateModal = true">新增任务</el-button>
+    <div class="header">
+      <el-button v-if="userStore.isLoggedIn">{{ 'hello' + ' ' + userStore.username }}</el-button>
+      <el-button v-if="userStore.isLoggedIn" @click="handleLogout">退出登录</el-button>
+      <el-button v-if="userStore.isLoggedIn" type="primary" @click="showCreateModal = true">新增任务</el-button>
+    </div>
     <div class="task-board">
-      <div v-for="status in statuses" :key="status" class="task-column">
+      <div 
+        v-for="status in statuses" 
+        :key="status" 
+        class="task-column"
+      >
         <h3>{{ status }}</h3>
-        <div class="task-card" v-for="task in filteredTasks(status)" :key="task.id">
+        <div 
+          class="task-card" 
+          v-for="task in filteredTasks(status)" 
+          :key="task.id"
+        >
           <h4>{{ task.title }}</h4>
           <p>{{ task.description }}</p>
           <el-tag :type="priorityColor(task.priority)">{{ task.priority }}</el-tag>
         </div>
       </div>
     </div>
-    <el-dialog v-model="showCreateModal" title="新增任务">
-      <el-form :model="newTask">
+    <el-dialog 
+      v-model="showCreateModal" 
+      title="新增任务" 
+      class="dialog"
+      width="600px"
+    >
+      <el-form 
+        :model="newTask"
+        class="create-task-form"
+        label-width="80px"
+      >
         <el-form-item label="标题">
           <el-input v-model="newTask.title" />
         </el-form-item>
@@ -88,9 +107,9 @@ const priorityColor = (priority: string) => {
 }
 
 // 用户退出
-const logout = () => {
-  router.push('/login') // 跳转到登录页面
+const handleLogout = () => {
   userStore.logout() // 模拟退出
+  router.push('/login') // 跳转到登录页面
 }
 </script>
 
