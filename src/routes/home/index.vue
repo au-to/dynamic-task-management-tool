@@ -130,14 +130,14 @@ const handleLogout = () => {
 // 关闭弹窗
 const handleClose = () => {
   showCreateModal.value = false
-  newTask = {
+  Object.assign(newTask, {
     id: '',
     title: '',
     description: '',
     priority: '',
     status: 'Pending',
     dueDate: ''
-  }
+  })
 }
 </script>
 
