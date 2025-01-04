@@ -24,6 +24,7 @@
         >
           登录
         </el-button>
+        <a class="link" @click="toRegister">去注册</a>
       </div>
     </div>
   </div>
@@ -62,6 +63,10 @@ const handleLogin = () => {
       return false
     }
   })
+}
+
+const toRegister = () => {
+  router.push('/register')
 }
 </script>
 
@@ -109,6 +114,14 @@ const handleLogin = () => {
       &:hover {
         background: #00acc1;
       }
+    }
+
+    .link {
+      color: #26c6da;
+      font-size: 14px;
+      cursor: pointer;
+      margin-left: 30px;
+      margin-top: 5px;
     }
   }
 }
