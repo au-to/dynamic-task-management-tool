@@ -19,7 +19,13 @@
         >
           <h4>{{ task.title }}</h4>
           <p>{{ task.description }}</p>
+          <p>{{ task.dueDate }}</p>
           <el-tag :type="priorityColor(task.priority)">{{ task.priority }}</el-tag>
+          <el-icon class="delete-icon" @click="taskStore.deleteTask(task.id)" color="red">
+            <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+              <path fill="currentColor" d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path>
+            </svg>
+          </el-icon>
         </div>
       </div>
     </div>
@@ -28,6 +34,7 @@
       title="新增任务" 
       class="dialog"
       width="600px"
+      @close="handleClose"
     >
       <el-form 
         :model="newTask"
@@ -35,17 +42,25 @@
         label-width="80px"
       >
         <el-form-item label="标题">
-          <el-input v-model="newTask.title" />
+          <el-input v-model="newTask.title" placeholder="请填写任务名称" />
         </el-form-item>
         <el-form-item label="描述">
-          <el-input v-model="newTask.description" />
+          <el-input v-model="newTask.description" placeholder="请填写任务描述" />
         </el-form-item>
         <el-form-item label="优先级">
-          <el-select v-model="newTask.priority" placeholder="选择优先级">
+          <el-select v-model="newTask.priority" placeholder="请选择优先级">
             <el-option label="低" value="Low" />
             <el-option label="中" value="Medium" />
             <el-option label="高" value="High" />
           </el-select>
+        </el-form-item>
+        <el-form-item label="截止日期" class="due-date">
+          <el-date-picker
+            v-model="newTask.dueDate"
+            type="datetime"
+            placeholder="请选择截止时间"
+            value-format="YYYY-MM-DD HH:MM"
+          />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -72,7 +87,7 @@ const userStore = useUserStore()
 const showCreateModal = ref(false)
 
 // 新任务的默认数据
-const newTask = reactive({
+let newTask = reactive({
   id: '',
   title: '',
   description: '',
@@ -111,6 +126,19 @@ const handleLogout = () => {
   userStore.logout() // 模拟退出
   router.push('/login') // 跳转到登录页面
 }
+
+// 关闭弹窗
+const handleClose = () => {
+  showCreateModal.value = false
+  newTask = {
+    id: '',
+    title: '',
+    description: '',
+    priority: '',
+    status: 'Pending',
+    dueDate: ''
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -132,6 +160,7 @@ const handleLogout = () => {
     }
 
     .task-card {
+      position: relative;
       background-color: white;
       margin: 10px 0;
       padding: 10px;
@@ -144,6 +173,32 @@ const handleLogout = () => {
 
       p {
         color: #666;
+      }
+
+      .delete-icon {
+        display: none;
+      }
+
+      &:hover {
+        box-shadow: inset 0 0 0 1px #f5f5f5;
+        cursor: pointer;
+        .delete-icon {
+          display: block;
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+
+  .dialog {
+    .create-task-form {
+      .due-date {
+        :deep(.el-date-editor) {
+          width: 100%;
+        }
       }
     }
   }

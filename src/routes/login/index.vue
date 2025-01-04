@@ -24,7 +24,7 @@
         >
           登录
         </el-button>
-        <a class="link" @click="toRegister">去注册</a>
+        <span class="register-link" @click="toRegister">去注册</span>
       </div>
     </div>
   </div>
@@ -52,8 +52,7 @@ const rules = {
 const handleLogin = () => {
   loginFormRef.value?.validate((valid: boolean) => {
     if (valid) {
-      userStore.username = loginForm.username
-      userStore.isLoggedIn = true
+      userStore.login(loginForm.username, loginForm.password)
       ElMessage({
         message: '登录成功',
         type: 'success',
@@ -116,12 +115,15 @@ const toRegister = () => {
       }
     }
 
-    .link {
+    .register-link {
+      box-sizing: border-box;
+      cursor: pointer;
+      display: inline-block;
+      height: 32px;
+      line-height: 32px;
       color: #26c6da;
       font-size: 14px;
-      cursor: pointer;
       margin-left: 30px;
-      margin-top: 5px;
     }
   }
 }

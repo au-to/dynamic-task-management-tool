@@ -12,15 +12,19 @@ export default defineStore('user', () => {
 
   // 初始化登录状态
   const initialize = () => {
-    const token = localStorage.getItem('loginToken')
+    const token: string | null = localStorage.getItem('loginToken')
     isLoggedIn.value = !!token
+    username.value = JSON.parse(token || '{}')?.name
   }
 
   // 用户登录
-  const login = (user: string) => {
-    username.value = user
+  const login = (name: string, passWord: string) => {
+    username.value = name
     isLoggedIn.value = true
-    const loginToken = username.value + new Date().getTime()
+    const loginToken = JSON.stringify({
+      name,
+      passWord
+    })
     localStorage.setItem('loginToken', loginToken)
   }
 
