@@ -2,51 +2,70 @@
  * 任务模块
  */
 
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
 export interface Task {
   id: string
   title: string
   description: string
-  priority: 'Low' | 'Medium' | 'High' // 优先级
-  status: 'Pending' | 'Progress' | 'Done' // 状态
-  dueDate: string // 截止日期
+  priority: 'Low' | 'Medium' | 'High'
+  status: 'Pending' | 'Progress' | 'Done'
+  dueDate: string
 }
 
 export default defineStore('task', () => {
-  // 定义任务列表的状态
-  const taskList = ref<Task[]>([])
-
-  // 根据状态过滤任务
-  const getTasksByStatus = computed(() => {
-    return (status: Task['status']) =>
-      taskList.value.filter((task) => task.status === status)
-  })
+  // 分别为每个状态维护一个任务列表
+  const pendingTasks = ref<Task[]>([])
+  const progressTasks = ref<Task[]>([])
+  const doneTasks = ref<Task[]>([])
 
   // 添加任务
   const addTask = (task: Task) => {
-    taskList.value.push(task)
-  }
-
-  // 更新任务
-  const updateTask = (task: Task) => {
-    const index = taskList.value.findIndex((item) => item.id === task.id)
-    if (index !== -1) {
-      taskList.value[index] = task
+    switch (task.status) {
+      case 'Pending':
+        pendingTasks.value.push(task)
+        break
+      case 'Progress':
+        progressTasks.value.push(task)
+        break
+      case 'Done':
+        doneTasks.value.push(task)
+        break
     }
   }
 
   // 删除任务
   const deleteTask = (id: string) => {
-    taskList.value = taskList.value.filter((task) => task.id !== id)
+    pendingTasks.value = pendingTasks.value.filter(task => task.id !== id)
+    progressTasks.value = progressTasks.value.filter(task => task.id !== id)
+    doneTasks.value = doneTasks.value.filter(task => task.id !== id)
   }
 
+  const updateTaskStatus = (id: string, newStatus: Task['status']) => {
+    const oldTask = getTaskById(id)
+    if (!oldTask) return
+    
+    deleteTask(id)
+    addTask({ ...oldTask, status: newStatus })
+  }
+  
+  const getTaskById = (id: string): Task | null => {
+    return (
+      pendingTasks.value.find(task => task.id === id) ||
+      progressTasks.value.find(task => task.id === id) ||
+      doneTasks.value.find(task => task.id === id) ||
+      null
+    )
+  }
+  
+
   return {
-    taskList,
-    getTasksByStatus,
+    pendingTasks,
+    progressTasks,
+    doneTasks,
     addTask,
-    updateTask,
-    deleteTask
+    deleteTask,
+    updateTaskStatus
   }
 })

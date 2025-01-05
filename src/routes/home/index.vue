@@ -6,18 +6,76 @@
       <el-button v-if="userStore.isLoggedIn" type="primary" @click="showCreateModal = true">新增任务</el-button>
     </div>
     <div class="task-board">
-      <div 
-        v-for="status in taskStatus" 
-        :key="status"
-        class="task-column"
-        :data-status="status"
-      >
-        <h3>{{ status }}</h3>
+      <!-- Pending Column -->
+      <div class="task-column">
+        <h3>Pending</h3>
         <Draggable 
-          :list="filteredTasks(status as 'Pending' | 'Progress' | 'Done')" 
-          group="{ name: 'tasks', pull: true, put: true }" 
-          @end="onTaskDrop"
-          :animation="200"
+          v-model="taskStore.pendingTasks" 
+          :group="{ name: 'tasks', pull: true, put: true }"
+          item-key="id"
+          @end="onDragEnd"
+        >
+          <template #item="{ element }">
+            <div class="task-card">
+              <h4>{{ element.title }}</h4>
+              <p>{{ element.description }}</p>
+              <p>{{ element.dueDate }}</p>
+              <el-tag :type="priorityColor(element.priority)">
+                {{ element.priority }}
+              </el-tag>
+              <el-icon 
+                class="delete-icon" 
+                @click="taskStore.deleteTask(element.id)" 
+                color="red"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+                  <path fill="currentColor" d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path>
+                </svg>
+              </el-icon>
+            </div>
+          </template>
+        </Draggable>
+      </div>
+
+      <!-- Progress Column -->
+      <div class="task-column">
+        <h3>Progress</h3>
+        <Draggable 
+          v-model="taskStore.progressTasks" 
+          :group="{ name: 'tasks', pull: true, put: true }"
+          item-key="id"
+          @end="onDragEnd"
+        >
+          <template #item="{ element }">
+            <div class="task-card">
+              <h4>{{ element.title }}</h4>
+              <p>{{ element.description }}</p>
+              <p>{{ element.dueDate }}</p>
+              <el-tag :type="priorityColor(element.priority)">
+                {{ element.priority }}
+              </el-tag>
+              <el-icon 
+                class="delete-icon" 
+                @click="taskStore.deleteTask(element.id)" 
+                color="red"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+                  <path fill="currentColor" d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path>
+                </svg>
+              </el-icon>
+            </div>
+          </template>
+        </Draggable>
+      </div>
+
+      <!-- Done Column -->
+      <div class="task-column">
+        <h3>Done</h3>
+        <Draggable 
+          v-model="taskStore.doneTasks" 
+          :group="{ name: 'tasks', pull: true, put: true }"
+          item-key="id"
+          @end="onDragEnd"
         >
           <template #item="{ element }">
             <div class="task-card">
@@ -89,6 +147,7 @@ import { useRouter } from 'vue-router'
 import useTaskStore from '@/store/modules/task'
 import useUserStore from '@/store/modules/user'
 import Draggable from 'vuedraggable'
+import type { Task } from '@/store/modules/task'
 
 const router = useRouter()
 
@@ -109,18 +168,12 @@ let newTask = reactive({
   dueDate: ''
 })
 
-// 任务的状态列表
-const taskStatus = ['Pending', 'Progress', 'Done'] as const
-
 // 创建任务
 const createTask = () => {
-  newTask.id = Date.now().toString() // 使用时间戳生成唯一 ID
-  taskStore.addTask({ ...newTask })  // 添加任务到 store
-  showCreateModal.value = false     // 关闭弹窗
+  newTask.id = Date.now().toString()
+  taskStore.addTask({ ...newTask })
+  showCreateModal.value = false
 }
-
-// 筛选任务：根据状态返回对应的任务列表
-const filteredTasks = (status: 'Pending' | 'Progress' | 'Done') => taskStore.getTasksByStatus(status)
 
 // 获取优先级对应的颜色
 const priorityColor = (priority: string) => {
@@ -153,21 +206,23 @@ const handleClose = () => {
   })
 }
 
-// 拖拽完成时更新任务状态
-const onTaskDrop = (event: any) => {
-  const { to, item } = event
+// 处理拖拽结束
+const onDragEnd = (evt: any) => {
+  const { item, to, from } = evt
+  if (!item || !to) return
 
   // 获取目标列的状态
-  const newStatus = to.getAttribute('data-status')
-  if (!newStatus) return
+  const newStatus = to.parentElement.querySelector('h3').textContent as Task['status']
+  const currentStatus = from.parentElement.querySelector('h3').textContent as Task['status']
 
-  // 更新任务状态
-  const task = item
-  if (task.status !== newStatus) {
-    taskStore.updateTask({ ...task, status: newStatus })
+  // 判断是否跨列拖拽
+  if (newStatus !== currentStatus) {
+    taskStore.deleteTask(item.id) // 从原列移除
+    taskStore.addTask({ ...item, status: newStatus }) // 添加到目标列
   }
 }
 </script>
+
 
 <style lang="scss" scoped>
 .home {
@@ -252,5 +307,10 @@ const onTaskDrop = (event: any) => {
       }
     }
   }
+}
+
+.ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
 }
 </style>
