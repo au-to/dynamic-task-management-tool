@@ -34,7 +34,7 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import useUserStore from '@/src/store/modules/user.ts'
+import useUserStore from '@/store/modules/user.ts'
 
 const userStore = useUserStore()
 const router = useRouter()

@@ -14,7 +14,7 @@
       >
         <h3>{{ status }}</h3>
         <Draggable 
-          :list="filteredTasks(status)" 
+          :list="filteredTasks(status as 'Pending' | 'Progress' | 'Done')" 
           group="{ name: 'tasks', pull: true, put: true }" 
           @end="onTaskDrop"
           :animation="200"
@@ -86,8 +86,8 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import useTaskStore from '@/src/store/modules/task.ts'
-import useUserStore from '@/src/store/modules/user.ts'
+import useTaskStore from '@/store/modules/task'
+import useUserStore from '@/store/modules/user'
 import Draggable from 'vuedraggable'
 
 const router = useRouter()
@@ -104,13 +104,13 @@ let newTask = reactive({
   id: '',
   title: '',
   description: '',
-  priority: '',
-  status: 'Pending',
+  priority: '' as 'Low' | 'Medium' | 'High',
+  status: 'Pending' as const,
   dueDate: ''
 })
 
 // 任务的状态列表
-const taskStatus = ['Pending', 'Progress', 'Done']
+const taskStatus = ['Pending', 'Progress', 'Done'] as const
 
 // 创建任务
 const createTask = () => {
@@ -120,7 +120,7 @@ const createTask = () => {
 }
 
 // 筛选任务：根据状态返回对应的任务列表
-const filteredTasks = (status: string) => taskStore.getTasksByStatus(status)
+const filteredTasks = (status: 'Pending' | 'Progress' | 'Done') => taskStore.getTasksByStatus(status)
 
 // 获取优先级对应的颜色
 const priorityColor = (priority: string) => {
