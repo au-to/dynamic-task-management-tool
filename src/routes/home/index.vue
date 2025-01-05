@@ -7,26 +7,38 @@
     </div>
     <div class="task-board">
       <div 
-        v-for="status in statuses" 
-        :key="status" 
+        v-for="status in taskStatus" 
+        :key="status"
         class="task-column"
+        :data-status="status"
       >
         <h3>{{ status }}</h3>
-        <div 
-          class="task-card" 
-          v-for="task in filteredTasks(status)" 
-          :key="task.id"
+        <Draggable 
+          :list="filteredTasks(status)" 
+          group="{ name: 'tasks', pull: true, put: true }" 
+          @end="onTaskDrop"
+          :animation="200"
         >
-          <h4>{{ task.title }}</h4>
-          <p>{{ task.description }}</p>
-          <p>{{ task.dueDate }}</p>
-          <el-tag :type="priorityColor(task.priority)">{{ task.priority }}</el-tag>
-          <el-icon class="delete-icon" @click="taskStore.deleteTask(task.id)" color="red">
-            <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-              <path fill="currentColor" d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path>
-            </svg>
-          </el-icon>
-        </div>
+          <template #item="{ element }">
+            <div class="task-card">
+              <h4>{{ element.title }}</h4>
+              <p>{{ element.description }}</p>
+              <p>{{ element.dueDate }}</p>
+              <el-tag :type="priorityColor(element.priority)">
+                {{ element.priority }}
+              </el-tag>
+              <el-icon 
+                class="delete-icon" 
+                @click="taskStore.deleteTask(element.id)" 
+                color="red"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+                  <path fill="currentColor" d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path>
+                </svg>
+              </el-icon>
+            </div>
+          </template>
+        </Draggable>
       </div>
     </div>
     <el-dialog 
@@ -76,6 +88,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import useTaskStore from '@/src/store/modules/task.ts'
 import useUserStore from '@/src/store/modules/user.ts'
+import Draggable from 'vuedraggable'
 
 const router = useRouter()
 
@@ -97,7 +110,7 @@ let newTask = reactive({
 })
 
 // 任务的状态列表
-const statuses = ['Pending', 'Progress', 'Done']
+const taskStatus = ['Pending', 'Progress', 'Done']
 
 // 创建任务
 const createTask = () => {
@@ -139,10 +152,35 @@ const handleClose = () => {
     dueDate: ''
   })
 }
+
+// 拖拽完成时更新任务状态
+const onTaskDrop = (event: any) => {
+  const { to, item } = event
+
+  // 获取目标列的状态
+  const newStatus = to.getAttribute('data-status')
+  if (!newStatus) return
+
+  // 更新任务状态
+  const task = item
+  if (task.status !== newStatus) {
+    taskStore.updateTask({ ...task, status: newStatus })
+  }
+}
 </script>
 
 <style lang="scss" scoped>
 .home {
+  .header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: 50px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f4f4f4;
+  }
   .task-board {
     display: flex;
     gap: 20px;
@@ -151,21 +189,27 @@ const handleClose = () => {
 
   .task-column {
     flex: 1;
-    background-color: #f5f5f5;
     padding: 10px;
+    background: #f4f4f4;
+    border: 1px solid #ddd;
     border-radius: 8px;
+    min-height: 300px;
 
     h3 {
       text-align: center;
+      margin-bottom: 10px;
+      color: #333;
     }
 
     .task-card {
-      position: relative;
-      background-color: white;
-      margin: 10px 0;
+      cursor: grab;
       padding: 10px;
-      border-radius: 8px;
+      margin: 10px 0;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 4px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
 
       h4 {
         margin: 0;
@@ -182,6 +226,7 @@ const handleClose = () => {
       &:hover {
         box-shadow: inset 0 0 0 1px #f5f5f5;
         cursor: pointer;
+        transform: translateY(-3px);
         .delete-icon {
           display: block;
           position: absolute;
@@ -189,6 +234,11 @@ const handleClose = () => {
           right: 10px;
           cursor: pointer;
         }
+      }
+
+      &:active {
+        cursor: grabbing;
+        opacity: 0.8;
       }
     }
   }
